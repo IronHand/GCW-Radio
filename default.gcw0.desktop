@@ -1,0 +1,8 @@
+[Desktop Entry]
+Name=PyRadio
+Type=Application
+Exec=run.py
+Icon=icon
+Comment=SDL frontend for fmtools
+Terminal=false
+Categories=applications;
