@@ -59,7 +59,7 @@ message_box_text = "Welcome!"
 master_frequenz = 90.0
 master_volume = 10.0
 master_brightness = subprocess.check_output(["cat", "/sys/class/backlight/pwm-backlight/brightness"]).replace("\n","")
-info_text.append(str(master_brightness))
+#info_text.append(str(master_brightness))
 
 user_input = False
 user_input_index = 0
@@ -470,14 +470,21 @@ def render_volume(x, y, fcolor, bcolor, rcolor):
 def render_favorits_list(select):
 	line = basic_font_size
 	new_rect = pygame.Rect(5,30,320, 0)
-	for fav in favorits_list[:]:
+	start_index = 0
+	if select > 5:
+		start_index = select-5
+	
+	for fav in favorits_list[start_index:]:
 		render_favorits = basicFont.render(str(fav).replace("\n",""), True, WHITE, BLACK)
 		windowSurface.blit(render_favorits, new_rect)
 		
 		new_rect = new_rect.move(0,basic_font_size)
 		line += basic_font_size	
-		
-	pygame.draw.rect(windowSurface, RED, pygame.Rect(2,25 + (select*basic_font_size),315,basic_font_size), 2)
+	
+	if select < 5:
+		pygame.draw.rect(windowSurface, RED, pygame.Rect(2,25 + (select*basic_font_size),315,basic_font_size), 2)
+	else:
+		pygame.draw.rect(windowSurface, RED, pygame.Rect(2,25 + (5*basic_font_size),315,basic_font_size), 2)
 	
 def render_message_box(text):
 	render_text_box = basicFont.render(str(text), True, WHITE, BLACK)
