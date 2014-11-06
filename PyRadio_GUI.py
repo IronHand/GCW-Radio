@@ -301,17 +301,78 @@ def button_start_fct():
 	if(menu_name == "Scan"):
 		if scan_option == 0:
 			global master_frequenz, message_box_text, scan_end, scan_quality
-			found_frequenz, quality = pyfm.fm_scan_next(master_frequenz,scan_end,scan_steps,scan_quality)
-			if found_frequenz >= 76:
+			
+			start = master_frequenz + 0.1
+			end = scan_end
+			
+			if start < 76:
+				start = 76
+			if end > 108:
+				end = 108
+			
+			found_frequenz = 0
+			best_qual = 0
+			start = int(start*10)
+			end = int(end*10)
+			break_point = False
+			if start < end:
+				for i in range(start,end,scan_steps):
+					best_qual = pyfm.fm_scan_once_next(i)
+					if best_qual >= scan_quality:
+						found_frequenz = i/10.0
+						break
+					
+					if i/10.0 > 108 or i/10.0 < 76:
+						break
+					
+					if break_point == True:
+						break
+					
+					for event in pygame.event.get():
+						if event.type == pygame.locals.KEYDOWN:
+							if event.key == pygame.locals.K_LALT:
+								break_point = True
+		
+			#found_frequenz, quality = pyfm.fm_scan_next(master_frequenz,scan_end,scan_steps,scan_quality)
+			
+			if found_frequenz >= 76 and break_point == False:
 				master_frequenz = found_frequenz
-				message_box_text = "Station Found " + str(quality) + "%"
+				message_box_text = "Station Found " + str(best_qual) + "%"
 			else:
 				message_box_text = "No Station Found"
 		elif scan_option == 1:
-			global bandwide_point_list, scan_start, scan_end, scan_steps 
-			bandwide_point_list = pyfm.fm_scan_all(scan_start, scan_end, scan_steps)
+			global master_frequenz, bandwide_point_list, scan_start, scan_end, scan_steps 
 			
-			message_box_text = "Scan Complete!"
+			bandwide_point_list = []
+			
+			start = scan_start
+			end = scan_end
+			
+			if start < 76:
+				start = 76
+			if end > 108:
+				end = 108
+	
+			start = int(start*10)
+			end = int(end*10)
+			break_point = False
+			for i in range(start,end,scan_steps):
+				bandwide_point_list.append(pyfm.fm_scan_once_all(i))
+				
+				if break_point == True:
+					break
+				
+				for event in pygame.event.get():
+					if event.type == pygame.locals.KEYDOWN:
+						if event.key == pygame.locals.K_LALT:
+							break_point = True
+				
+			#bandwide_point_list = pyfm.fm_scan_all(scan_start, scan_end, scan_steps)
+			
+			if break_point == False:
+				message_box_text = "Scan Complete!"
+			else:
+				message_box_text = "Scan Canceled!"
 			
 			#info_text.append(str(len(bandwide_point_list)))
 			#info_text.append(str(bandwide_point_list[1]))

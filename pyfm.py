@@ -75,6 +75,19 @@ def fm_scan_next(start, end, steps, min_quality):
 	
 	return frequenz, best_qual
 	
+def fm_scan_once_next(i):
+
+	res = subprocess.check_output(["fmscan", "-s " + str(i/10.0), "-e " + str(i/10.0)]).replace("\n","")
+	res_sp = res.split("\r")
+	
+	best_qual = 0
+	for j in res_sp:
+		if "checking" in j:
+			qual = j[j.index("g:")+3:j.index("%")]
+			best_qual = max(float(qual), best_qual)
+	
+	return best_qual
+	
 def fm_scan_all(start, end, steps):
 
 	if start < 76:
@@ -100,3 +113,19 @@ def fm_scan_all(start, end, steps):
 		quality_list.append(qual_point)
 				
 	return quality_list
+
+def fm_scan_once_all(i):
+
+	res = subprocess.check_output(["fmscan", "-s " + str(i/10.0), "-e " + str(i/10.0)]).replace("\n","")
+	res_sp = res.split("\r")
+	
+	best_qual = 0
+	for j in res_sp:
+		if "checking" in j:
+			qual = j[j.index("g:")+3:j.index("%")]
+			best_qual = max(float(qual), best_qual)
+		
+		qual_point = [i,best_qual]
+		
+	return qual_point
+	
