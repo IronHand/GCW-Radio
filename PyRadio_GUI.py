@@ -182,7 +182,8 @@ def menu_schedul(index):
 		menu_index = index
 		
 	menu_name = menu_list[index]
-		
+
+#Button Funktions	
 def button_up():
 	global user_input
 	if user_input == False:
@@ -224,6 +225,7 @@ def button_left():
 			scan_option = 0
 			message_box_text = "from current frequenzy"
 	else:
+		button_left_state = False
 		if user_input_index > 0:
 			user_input_index -= 1
 
@@ -237,6 +239,7 @@ def button_right():
 			scan_option = 1
 			message_box_text = "Take a long time!"
 	else:
+		button_right_state = False
 		user_input_index += 1
 		
 def button_a_fnc():
@@ -415,7 +418,12 @@ def set_user_input(direction):
 	user_input_string = ""
 	for char in user_input_array:
 		user_input_string += char
-		
+
+def show_current_quality():
+	global message_box_text
+	quality = pyfm.fm_scan_once_next(master_frequenz*10)
+	message_box_text = "Quality of " + str(master_frequenz) + " = " + str(quality) + "%"
+	
 def set_scan_options(value):
 	if scan_option_index == 0:
 		global scan_quality
@@ -435,9 +443,11 @@ def set_scan_options(value):
 		if scan_steps <= 0:
 			scan_steps = 1
 	elif scan_option_index == 4:
+		show_current_quality()
+	elif scan_option_index == 5:
 		global point_list_b
 		point_list_b = []
-		
+	
 def tune_favorit():
 	global favorits_list, favorit_selector, master_frequenz, master_volume
 	
@@ -590,10 +600,18 @@ def render_input_box():
 	pygame.draw.rect(windowSurface, WHITE, pygame.Rect(20,100,280,basic_font_size), 3)
 	
 	render_text_box = basicFont.render(user_input_string, True, WHITE, BLACK)
-	#text_Rect = render_text_box.get_rect()
 	windowSurface.blit(render_text_box, pygame.Rect(25,102,280,basic_font_size))
 	
-	pygame.draw.rect(windowSurface, RED, pygame.Rect(25+8*user_input_index,117,8,2), 0)
+	render_text_box = basicFont.render(user_input_string[:user_input_index], True, WHITE, BLACK)
+	text_Rect = render_text_box.get_rect()
+	
+	try:
+		render_text_box = basicFont.render(user_input_string[user_input_index], True, RED, BLACK)
+		windowSurface.blit(render_text_box, pygame.Rect(25+text_Rect.width,102,280,basic_font_size))
+	except:
+		pass
+		
+	#pygame.draw.rect(windowSurface, RED, pygame.Rect(25+8*user_input_index,117,8,2), 0)
 		
 #Read In Config File
 read_config()
@@ -810,8 +828,11 @@ while True:
 			render_scan_suboptions = basicFont.render("Steps  :                                 " + str(scan_steps/10.0) + " Mhz", True, WHITE, BLACK)
 			windowSurface.blit(render_scan_suboptions, pygame.Rect(25,60+basic_font_size*3,310,basic_font_size))
 			
-			render_scan_suboptions = basicFont.render("Delete Scan                              ", True, WHITE, BLACK)
+			render_scan_suboptions = basicFont.render("Get Current Quality                      ", True, WHITE, BLACK)
 			windowSurface.blit(render_scan_suboptions, pygame.Rect(25,60+basic_font_size*4,310,basic_font_size))
+			
+			render_scan_suboptions = basicFont.render("Delete Scan                              ", True, WHITE, BLACK)
+			windowSurface.blit(render_scan_suboptions, pygame.Rect(25,60+basic_font_size*5,310,basic_font_size))
 			
 			pygame.draw.rect(windowSurface, RED, pygame.Rect(15,56+basic_font_size*scan_option_index,275,basic_font_size), 2)
 			
