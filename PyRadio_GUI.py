@@ -709,7 +709,7 @@ while True:
 				button_pause = True
 				subprocess.Popen("echo -n 0 > /sys/class/backlight/pwm-backlight/brightness", shell=True)
 			
-		elif button_pause == True:
+		elif event.type == pygame.locals.KEYDOWN and button_pause == True:
 			if volume_no_lock == 1:
 				if event.key == pygame.locals.K_UP:
 					volume_up()
