@@ -59,6 +59,7 @@ message_box_text = "Welcome!"
 master_frequenz = 90.0
 master_volume = 10.0
 master_brightness = subprocess.check_output(["cat", "/sys/class/backlight/pwm-backlight/brightness"]).replace("\n","")
+volume_no_lock = 0
 #info_text.append(str(master_brightness))
 
 user_input = False
@@ -114,15 +115,15 @@ def tune_up():
 		info_text.append(pyfm.fm_tune(master_frequenz, master_volume))
 
 def write_config():
-	global master_volume, master_frequenz
+	global master_volume, master_frequenz, volume_no_lock
 	
 	file = open(home_path + config_name, 'w+')
-	data = "master_frequenz " + str(master_frequenz) + "\n" + "master_volume " + str(master_volume) + "\n"
+	data = "master_frequenz " + str(master_frequenz) + "\n" + "master_volume " + str(master_volume) + "\n" + "volume_no_lock " + str(volume_no_lock) + "\n"
 	file.write(data)
 	file.close()
 		
 def read_config():
-	global master_volume, master_frequenz
+	global master_volume, master_frequenz, volume_no_lock
 	try:
 		file = open(home_path + config_name, 'r')
 	except:
@@ -146,6 +147,8 @@ def read_config():
 			master_frequenz = float(line.replace("master_frequenz ",""))
 		if("master_volume" in line):
 			master_volume = float(line.replace("master_volume ",""))
+		if("volume_no_lock" in line):
+			volume_no_lock = int(line.replace("volume_no_lock ",""))
 
 def write_favorits():
 	global favorits_list
@@ -700,11 +703,19 @@ while True:
 						message_box_text = "Scanning Next Station!"
 					else:
 						message_box_text = "Scanning All Stations!"
+						
 			#Pause Button
 			if event.key == pygame.locals.K_PAUSE:
 				button_pause = True
 				subprocess.Popen("echo -n 0 > /sys/class/backlight/pwm-backlight/brightness", shell=True)
-					
+			
+		elif button_pause == True:
+			if volume_no_lock == 1:
+				if event.key == pygame.locals.K_UP:
+					volume_up()
+				if event.key == pygame.locals.K_DOWN:
+					volume_down()
+							
 		if event.type == pygame.locals.KEYUP:
 			if button_pause == False:
 				#Exit
@@ -736,12 +747,14 @@ while True:
 					button_x = False
 					button_x_fnc()
 				
+				if event.key == pygame.locals.K_TAB:
+					button_left_shoulder = False
+					
 				if event.key == pygame.locals.K_RETURN:
 					button_start_fct()
 				if event.key == pygame.locals.K_ESCAPE:
 					button_select = False	
-				if event.key == pygame.locals.K_TAB:
-					button_left_shoulder = False
+				
 			#Pause OFF
 			if event.key == pygame.locals.K_PAUSE:
 				button_pause = False
