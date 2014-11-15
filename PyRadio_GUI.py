@@ -14,13 +14,10 @@ windowSurface = pygame.display.set_mode((WINDOWWIDTH, WINDOWHEIGHT), 0, 32)
 pygame.display.set_caption('PyRadio Zero')
 
 BLACK = (0, 0, 0)
-BACK_BLACK = (20, 20, 20)
 WHITE = (255, 255, 255)
 GRAY = (128, 128, 128)
 RED = (255, 0, 0)
 GREEN = (0, 255, 0)
-
-Colors = [(0, 0, 0),(255, 255, 255),(255, 0, 0),(0, 255, 0),(0, 0, 255)]
 
 #Paths
 home_path = "/media/home/.pyradio/"
@@ -42,13 +39,11 @@ info_text = [" "," "," "," "," "]
 #Globals
 menu_index = 0
 menu_name = "Main"
-menu_list = ["Main","Favorits","Scan","Settings"]#,"debug"]
+menu_list = ["Main","Favorits","Scan"]#,"debug"]
 
 favorits_list = []
 favorits_description_list = []
 favorit_selector = 0
-
-setting_index = 0
 
 scan_option = 0
 scan_option_index = 0
@@ -73,16 +68,6 @@ user_input_array = []
 user_input_string = ""
 
 output_device = "headphone"
-
-def reset_colors():
-	global BLACK, BACK_BLACK, WHITE, GRAY, RED, GREEN
-	
-	BLACK = (0, 0, 0)
-	BACK_BLACK = (20, 20, 20)
-	WHITE = (255, 255, 255)
-	GRAY = (128, 128, 128)
-	RED = (255, 0, 0)
-	GREEN = (0, 255, 0)
 
 def close_fm():
 	write_config()
@@ -130,15 +115,15 @@ def tune_up():
 		info_text.append(pyfm.fm_tune(master_frequenz, master_volume))
 
 def write_config():
-	global master_volume, master_frequenz, volume_no_lock,BLACK,WHITE,RED,GREEN
+	global master_volume, master_frequenz, volume_no_lock
 	
 	file = open(home_path + config_name, 'w+')
-	data = "master_frequenz " + str(master_frequenz) + "\n" + "master_volume " + str(master_volume) + "\n" + "volume_no_lock " + str(volume_no_lock) + "\n" + "BLACK " + str(BLACK) + "\n" + "WHITE " + str(WHITE) + "\n" + "RED " + str(RED) + "\n" + "GREEN " + str(GREEN)
+	data = "master_frequenz " + str(master_frequenz) + "\n" + "master_volume " + str(master_volume) + "\n" + "volume_no_lock " + str(volume_no_lock) + "\n"
 	file.write(data)
 	file.close()
 		
 def read_config():
-	global master_volume, master_frequenz, volume_no_lock, BLACK, WHITE, RED, GREEN
+	global master_volume, master_frequenz, volume_no_lock
 	try:
 		file = open(home_path + config_name, 'r')
 	except:
@@ -164,26 +149,6 @@ def read_config():
 			master_volume = float(line.replace("master_volume ",""))
 		if("volume_no_lock" in line):
 			volume_no_lock = int(line.replace("volume_no_lock ",""))
-		if("BLACK" in line):
-			line = line.replace("BLACK (","")
-			line = line.replace(")","")
-			s_line = line.split(",")
-			BLACK = (int(s_line[0]),int(s_line[1]),int(s_line[2]))
-		if("WHITE" in line):
-			line = line.replace("WHITE (","")
-			line = line.replace(")","")
-			s_line = line.split(",")
-			WHITE = (int(s_line[0]),int(s_line[1]),int(s_line[2]))
-		if("RED" in line):
-			line = line.replace("RED (","")
-			line = line.replace(")","")
-			s_line = line.split(",")
-			RED = (int(s_line[0]),int(s_line[1]),int(s_line[2]))
-		if("GREEN" in line):
-			line = line.replace("GREEN (","")
-			line = line.replace(")","")
-			s_line = line.split(",")
-			GREEN = (int(s_line[0]),int(s_line[1]),int(s_line[2]))
 
 def write_favorits():
 	global favorits_list
@@ -237,11 +202,6 @@ def button_up():
 			
 			if scan_option_index > 0:
 				scan_option_index -= 1
-		elif(menu_name == "Settings"):
-			global setting_index
-			
-			if setting_index > 0:
-				setting_index -= 1
 
 def button_down():
 	global user_input
@@ -257,11 +217,6 @@ def button_down():
 			
 			if scan_option_index < 5:
 				scan_option_index += 1
-		elif(menu_name == "Settings"):
-			global setting_index
-			
-			if setting_index < 2:
-				setting_index += 1
 			
 def button_left():
 	global user_input, user_input_index
@@ -297,8 +252,6 @@ def button_a_fnc():
 			tune_favorit()
 		elif(menu_name == "Scan"):
 			set_scan_options(1)
-		elif(menu_name == "Settings"):
-			set_settings(0)	
 	else:
 		global favorits_list, user_input_string, favorit_selector
 		favorits_list[favorit_selector] = favorits_list[favorit_selector][:6].replace("\n","") + "          " + user_input_string + "\n"
@@ -311,8 +264,6 @@ def button_b_fnc():
 			set_scan_options(-1)
 		elif(menu_name == "Favorits"):
 			favorit_down()
-		elif(menu_name == "Settings"):
-			set_settings(1)	
 	else:
 		user_input = False
 		
@@ -331,8 +282,6 @@ def button_x_fnc():
 			user_input_array = []
 			user_input_index = 0
 			user_input = True
-	elif(menu_name == "Settings"):
-		set_settings(2)	
 	
 def button_y_fnc():
 	if(menu_name == "Main"):
@@ -343,8 +292,6 @@ def button_y_fnc():
 		set_scan_options(10)
 	elif(menu_name == "Favorits"):
 		favorit_up()
-	elif(menu_name == "Settings"):
-		set_settings(3)	
 
 def button_select_fct():
 	if(menu_name == "Main"):
@@ -453,8 +400,6 @@ def button_start_fct():
 			pyfm.set_headphone_source("Line In")
 			pyfm.set_line_out_source("PCM")
 			pyfm.set_speaker("off")
-	elif(menu_name == "Settings"):
-		set_settings(4)
 
 def set_user_input(direction):
 	global user_input_index, user_input_array, user_input_string
@@ -505,42 +450,6 @@ def set_scan_options(value):
 	elif scan_option_index == 5:
 		global point_list_b
 		point_list_b = []
-
-def set_settings(value):
-	if setting_index == 0:
-		global volume_no_lock
-		if volume_no_lock == 0:
-			volume_no_lock = 1
-		else:
-			volume_no_lock = 0
-	if setting_index == 1:
-		global BLACK,WHITE,RED,GREEN
-		if value == 0:
-			c_index = Colors.index(BLACK)
-			if (c_index + 1) < len(Colors):
-				BLACK = Colors[c_index + 1]
-			else:
-				BLACK = Colors[0]
-		if value == 1:
-			c_index = Colors.index(WHITE)
-			if (c_index + 1) < len(Colors):
-				WHITE = Colors[c_index + 1]
-			else:
-				WHITE = Colors[0]
-		if value == 2:
-			c_index = Colors.index(RED)
-			if (c_index + 1) < len(Colors):
-				RED = Colors[c_index + 1]
-			else:
-				RED = Colors[0]
-		if value == 3:
-			c_index = Colors.index(GREEN)
-			if (c_index + 1) < len(Colors):
-				GREEN = Colors[c_index + 1]
-			else:
-				GREEN = Colors[0]
-		if value == 4:
-			reset_colors()
 	
 def tune_favorit():
 	global favorits_list, favorit_selector, master_frequenz, master_volume
@@ -941,27 +850,7 @@ while True:
 			pygame.draw.rect(windowSurface, RED, pygame.Rect(15,56+basic_font_size*scan_option_index,275,basic_font_size), 2)
 			
 			render_bandwide_analysis(RED)
-			
-		#Setting Menu
-		if(menu_name == "Settings"):
-			#Settings
-			render_settings = basicFont.render("Volume No Lock:                          " + str(not not volume_no_lock), True, WHITE, BLACK)
-			windowSurface.blit(render_settings, pygame.Rect(25,60,310,basic_font_size))
-			
-			render_settings = basicFont.render("Colors:                                  ", True, WHITE, BLACK)
-			windowSurface.blit(render_settings, pygame.Rect(25,60+basic_font_size,310,basic_font_size))
-			
-			render_settings = basicFont.render("A", True, BLACK, BACK_BLACK)
-			windowSurface.blit(render_settings, pygame.Rect(100,60+basic_font_size,310,basic_font_size))
-			render_settings = basicFont.render("B", True, WHITE, BACK_BLACK)
-			windowSurface.blit(render_settings, pygame.Rect(110,60+basic_font_size,310,basic_font_size))
-			render_settings = basicFont.render("X", True, RED, BACK_BLACK)
-			windowSurface.blit(render_settings, pygame.Rect(120,60+basic_font_size,310,basic_font_size))
-			render_settings = basicFont.render("Y", True, GREEN, BACK_BLACK)
-			windowSurface.blit(render_settings, pygame.Rect(130,60+basic_font_size,310,basic_font_size))
-			
-			pygame.draw.rect(windowSurface, RED, pygame.Rect(15,56+basic_font_size*setting_index,275,basic_font_size), 2)
-		
+				
 		#Message Box
 		if(len(message_box_text) > 0):
 			render_message_box(message_box_text)
