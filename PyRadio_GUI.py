@@ -1,5 +1,5 @@
-#Polygon from Hand by Iron Hand
-#------------------------------
+#GCW-Radio a FM Frontend for the GCW Zero by Iron Hand
+#-----------------------------------------------------
 
 import pygame, os, subprocess, math
 import pygame.locals
